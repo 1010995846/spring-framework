@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2020 the original author or authors.
+ * Copyright 2002-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@ import org.springframework.util.Assert;
  * Strategy used to populate, initialize, or clean up a database.
  *
  * @author Mark Paluch
+ * @author Keith Donald
+ * @author Sam Brannen
  * @since 5.3
  * @see ResourceDatabasePopulator
  * @see ConnectionFactoryInitializer
@@ -38,7 +40,6 @@ public interface DatabasePopulator {
 	/**
 	 * Populate, initialize, or clean up the database using the
 	 * provided R2DBC {@link Connection}.
-	 *
 	 * @param connection the R2DBC connection to use to populate the db;
 	 * already configured and ready to use, must not be {@code null}
 	 * @return {@link Mono} that initiates script execution and is
@@ -53,8 +54,7 @@ public interface DatabasePopulator {
 	 * @return {@link Mono} that initiates {@link DatabasePopulator#populate(Connection)}
 	 * and is notified upon completion
 	 */
-	default Mono<Void> populate(ConnectionFactory connectionFactory)
-			throws DataAccessException {
+	default Mono<Void> populate(ConnectionFactory connectionFactory) throws DataAccessException {
 		Assert.notNull(connectionFactory, "ConnectionFactory must not be null");
 		return Mono.usingWhen(ConnectionFactoryUtils.getConnection(connectionFactory), //
 				this::populate, //
